@@ -787,8 +787,12 @@ class SideBySideEditor:
             self.left_text.delete("1.0", tk.END)
             self.left_text.insert(tk.END, original_lines)
             self.left_text.highlight_markdown()
-            self.left_toc.schedule_update()
 
+            self.left_text.mark_set("insert", "1.0")  # ставим курсор в начало
+            self.left_text.see("insert")
+            self.left_text.focus_set()
+
+            self.left_toc.schedule_update()
             # Обновляем заголовок после загрузки файлов
             self.update_file_title()
 

@@ -247,12 +247,14 @@ class SideBySideEditor:
         self.left_frame.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
         self.left_text = MarkdownText(self.left_frame, wrap="word")
-        self.left_scroll = tk.Scrollbar(self.left_frame, command=self.on_scroll_left)
+        self.left_scroll = tk.Scrollbar(
+            self.left_frame, command=self.on_scroll_left, width=15
+        )
 
         # Левый редактор с оглавлением
         self.left_toc = TOCList(self.left_frame, self.left_text)
         self.left_toc_scroll = tk.Scrollbar(
-            self.left_frame, orient=tk.VERTICAL, command=self.left_toc.yview
+            self.left_frame, orient=tk.VERTICAL, command=self.left_toc.yview, width=15
         )
         self.left_toc.configure(yscrollcommand=self.left_toc_scroll.set)
 

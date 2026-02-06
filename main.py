@@ -27,7 +27,7 @@ class SideBySideEditor:
         self.search_started = None
 
         self.root = root
-        self.root.title("Paraline")
+        self.root.title("MD Editor")
 
         self.orig_path = ""
 

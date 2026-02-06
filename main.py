@@ -252,8 +252,9 @@ class SideBySideEditor:
         # Левый редактор с оглавлением
         self.left_toc = TOCList(self.left_frame, self.left_text)
         self.left_toc_scroll = tk.Scrollbar(
-            self.left_frame, command=self.on_scroll_left_toc
+            self.left_frame, orient=tk.VERTICAL, command=self.left_toc.yview
         )
+        self.left_toc.configure(yscrollcommand=self.left_toc_scroll.set)
 
         self.left_toc.pack(side=tk.LEFT, fill=tk.Y)
         self.left_toc_scroll.pack(side=tk.LEFT, fill=tk.Y)
@@ -692,12 +693,6 @@ class SideBySideEditor:
 
         except ValueError:
             pass
-
-    def init_toc_state(self):
-        # Скрываем TOC по умолчанию
-        self.left_toc.pack_forget()
-        # Иконки в начальном состоянии
-        self.toggle_left_toc_button.config(text="📑")
 
     def toggle_left_toc(self):
         if self.left_toc.winfo_ismapped():

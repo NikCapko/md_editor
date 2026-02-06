@@ -8,7 +8,7 @@ class MarkdownText(tk.Text):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.base_font = font.Font(family="TkDefaultFont", size=12)
+        self.base_font = font.Font(family="Monospace", size=10)
         self.config(font=self.base_font)
 
         self.configure(undo=True, maxundo=20)

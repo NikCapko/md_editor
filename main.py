@@ -14,8 +14,10 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 
+from dialog_manager import DialogManager
 from line_numbers import LineNumbers
 from markdown_text import MarkdownText
+from text_corrector import TextCorrector
 from toc_list import TOCList
 from tooltip import ToolTip
 
@@ -304,9 +306,6 @@ class SideBySideEditor:
             file_path = sys.argv[1]
             self.load_md_file(file_path)
 
-    def update_left_text_async(self):
-        self.left_text.after(300, self.update_left_text)
-
     def update_left_text(self):
         self.left_text.schedule_highlight_markdown()
         self.left_toc.schedule_update()
@@ -322,7 +321,7 @@ class SideBySideEditor:
 
     def open_metadata_dialog(self):
         if not self.orig_path:
-            show_dialog("Ошибка", "Сначала откройте файл.")
+            DialogManager.show_dialog("Ошибка", "Сначала откройте файл.")
             return
 
         dialog = tk.Toplevel(self.root)
@@ -469,7 +468,7 @@ class SideBySideEditor:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
         dialog.destroy()
-        show_dialog("Сохранено", "Метаданные успешно сохранены.")
+        DialogManager.show_dialog("Сохранено", "Метаданные успешно сохранены.")
 
     def on_ctrl_f(self, event):
         # определяем, в каком текстовом поле был фокус при нажатии
@@ -564,57 +563,9 @@ class SideBySideEditor:
         self.search_target_widget.tag_add("search_highlight", start_pos, end_pos)
 
     def correct_text(self):
-        self.correct_text_frame_content(self.left_text)
+        self.text_corrector = TextCorrector(self.left_text)
+        self.text_corrector.correct_text()
         self.left_toc.schedule_update()
-
-    def correct_text_frame_content(self, text_frame):
-        text = text_frame.get("1.0", tk.END).strip()
-        simple_repl, regex_repl = self.load_replacements(CONFIG_FILE)
-        text = self.normalize_text(text, simple_repl, regex_repl)
-        text_frame.delete("1.0", tk.END)
-        text_frame.insert(tk.END, text)
-        text_frame.highlight_markdown()
-
-    def load_replacements(self, config_path: str):
-        with open(config_path, "r", encoding="utf-8") as f:
-            config = json.load(f)
-        return config.get("simple", {}), config.get("regex", {})
-
-    def fix_line_start_spaces(self, content: str) -> str:
-        new_lines = []
-        for line in content.splitlines():
-            stripped = line.lstrip()
-            if line.startswith(("#", "%")) or stripped.startswith("*"):
-                # служебные строки и списки остаются как есть
-                new_lines.append(line)
-            else:
-                # убираем лишние пробелы и добавляем ровно один
-                if stripped:
-                    line = " " + stripped
-                else:
-                    line = stripped
-                new_lines.append(line)
-        return "\n".join(new_lines)
-
-    def normalize_text(self, content: str, simple_repl: dict, regex_repl: dict) -> str:
-        # Простые замены
-        for old, new in simple_repl.items():
-            content = content.replace(old, new)
-
-        # Замены через регулярки
-        for pattern, repl in regex_repl.items():
-            content = re.sub(pattern, repl, content, flags=re.MULTILINE)
-
-        # Убираем пробелы перед \n
-        content = re.sub(r" \n", "\n", content)
-        content = re.sub(r"\n #", "\n#", content)
-        content = re.sub(r"\n %", "\n%", content)
-        content = re.sub(r"\n\n%", "\n%", content)
-
-        # Гарантируем ровно один пробел в начале строки
-        content = self.fix_line_start_spaces(content)
-
-        return content.strip() + "\n"
 
     def index_to_text_pos(self, text, index):
         """Преобразует позицию символа (int) в формат 'строка.символ' для Text"""
@@ -623,7 +574,6 @@ class SideBySideEditor:
         return f"{line}.{col}"
 
     def find_all_matches(self, widget, term, use_regex=False, select_all=False):
-        # widget.tag_remove("search_highlight", "1.0", tk.END)
         widget.tag_remove("current_line", "1.0", tk.END)
         self.search_matches.clear()
         self.search_index = -1
@@ -641,7 +591,7 @@ class SideBySideEditor:
                         widget.tag_remove("search_highlight_all", "1.0", tk.END)
                     self.search_matches.append([start_index, end_index])
             except re.error as e:
-                show_dialog("Ошибка RegEx", str(e))
+                DialogManager.show_dialog("Ошибка RegEx", str(e))
                 return
         else:
             start_pos = "1.0"
@@ -760,10 +710,10 @@ class SideBySideEditor:
             self.left_text.update_idletasks()  # опционально, но помогает
             self.root.after_idle(lambda: self.left_text.yview_moveto(left_scroll_pos))
 
-            show_dialog("Готово", "Файлы перезагружены с диска.")
+            DialogManager.show_dialog("Готово", "Файлы перезагружены с диска.")
 
         except Exception as e:
-            show_dialog("Ошибка загрузки", str(e))
+            DialogManager.show_dialog("Ошибка загрузки", str(e))
 
     def load_md_file_dialog(self):
         file_path = filedialog.askopenfilename(
@@ -797,7 +747,7 @@ class SideBySideEditor:
             self.update_file_title()
 
         except Exception as e:
-            show_dialog("Ошибка", str(e))
+            DialogManager.show_dialog("Ошибка", str(e))
 
     def adjust_scroll_to_position(self, text_widget, target_index, target_y):
         """Корректирует прокрутку, чтобы указанная позиция была на заданной высоте"""
@@ -816,7 +766,7 @@ class SideBySideEditor:
 
     def export_book(self, book_type):
         if not self.orig_path:
-            show_dialog("Ошибка", "Файл не загружен")
+            DialogManager.show_dialog("Ошибка", "Файл не загружен")
             return
 
         original_lines = self.left_text.get("1.0", tk.END).strip().splitlines()
@@ -851,7 +801,7 @@ class SideBySideEditor:
             save_path = os.path.join(base_dir, f"{base_name}.epub")
             epub.write_epub(save_path, book)
             subprocess.Popen(["xdg-open", save_path])
-            show_dialog("Готово", f"EPUB сохранён: {save_path}")
+            DialogManager.show_dialog("Готово", f"EPUB сохранён: {save_path}")
 
         # ---- PDF ----
         elif book_type.startswith("pdf"):
@@ -859,10 +809,10 @@ class SideBySideEditor:
             font_path = "/usr/share/fonts/TTF/DejaVuSans.ttf"
             bold_font_path = "/usr/share/fonts/TTF/DejaVuSans-Bold.ttf"
             if not os.path.exists(font_path):
-                show_dialog("Ошибка", f"Не найден шрифт {font_path}")
+                DialogManager.show_dialog("Ошибка", f"Не найден шрифт {font_path}")
                 return
             if not os.path.exists(bold_font_path):
-                show_dialog("Ошибка", f"Не найден шрифт {bold_font_path}")
+                DialogManager.show_dialog("Ошибка", f"Не найден шрифт {bold_font_path}")
                 return
             pdfmetrics.registerFont(TTFont("DejaVu", font_path))
             pdfmetrics.registerFont(TTFont("DejaVu-Bold", bold_font_path))
@@ -906,7 +856,7 @@ class SideBySideEditor:
 
             doc.build(elements)
             subprocess.Popen(["xdg-open", save_path])
-            show_dialog("Готово", f"PDF сохранён: {save_path}")
+            DialogManager.show_dialog("Готово", f"PDF сохранён: {save_path}")
 
     def save_md_files(self):
         try:
@@ -935,10 +885,10 @@ class SideBySideEditor:
             with open(self.orig_path, "w", encoding="utf-8") as f:
                 f.write("\n".join(original_text) + "\n")
 
-            show_dialog("Успех", "Файлы сохранены.")
+            DialogManager.show_dialog("Успех", "Файлы сохранены.")
 
         except Exception as e:
-            show_dialog("Ошибка сохранения", str(e))
+            DialogManager.show_dialog("Ошибка сохранения", str(e))
 
     def highlight_current_line_left(self, event=None):
         # даём курсору переместиться, затем подсвечиваем
@@ -956,24 +906,6 @@ class SideBySideEditor:
         line_start = f"{index.split('.')[0]}.0"
         line_end = f"{index.split('.')[0]}.end"
         text_widget.tag_add("current_line", line_start, line_end)
-
-
-def show_dialog(title, message, timeout=1000):
-    dialog = tk.Toplevel()
-    dialog.geometry("300x100")
-    dialog.resizable(False, False)
-
-    label = tk.Label(dialog, text=title + "\n\n" + message)
-    label.pack(expand=True, padx=20, pady=20)
-
-    # Центрируем окно на экране
-    dialog.update_idletasks()
-    x = (dialog.winfo_screenwidth() - dialog.winfo_width()) // 2
-    y = (dialog.winfo_screenheight() - dialog.winfo_height()) // 2
-    dialog.geometry(f"+{x}+{y}")
-
-    # Закрыть окно через timeout миллисекунд
-    dialog.after(ms=timeout, func=dialog.destroy)
 
 
 if __name__ == "__main__":

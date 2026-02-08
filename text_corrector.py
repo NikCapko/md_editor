@@ -1,3 +1,4 @@
+import os
 import re
 import tkinter as tk
 
@@ -47,14 +48,29 @@ class TextCorrector:
     def __init__(self, text_frame: MarkdownText):
         self.text_frame = text_frame
 
-    def correct_text(self):
+    def correct_text(self, file_path):
         text = self.text_frame.get("1.0", tk.END).strip()
-        text = self.normalize_text(text)
+        text = self.normalize_text(text, file_path)
         self.text_frame.delete("1.0", tk.END)
         self.text_frame.insert(tk.END, text)
         self.text_frame.highlight_markdown()
 
-    def normalize_text(self, content: str) -> str:
+    def normalize_text(self, content: str, file_path: str) -> str:
+        # Заголовок
+        filename, _ = os.path.splitext(os.path.basename(file_path))
+        base_name = re.sub(r" \[.*?\]", "", filename).strip().replace(".", "_")
+        if content.startswith("#"):
+            match = re.match(r"^(.*?)(?:\[(.*?)\])?$", filename)
+            title = ""
+            author = ""
+            if match:
+                title = match.group(1).strip()
+                if match.group(2):
+                    author = match.group(2).strip()
+            content = f"% {title}\n% Автор: {author}\n\n\n{content}"
+        elif content.startswith("\n%"):
+            content = f"% {base_name}{content}"
+
         # Простые замены
         for old, new in replacements["simple"].items():
             content = content.replace(old, new)

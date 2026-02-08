@@ -353,12 +353,21 @@ class SideBySideEditor:
     def toggle_left_toc(self):
         if self.left_toc.winfo_ismapped():
             self.left_toc.pack_forget()
+            self.left_toc_scroll.pack_forget()
             self.toggle_left_toc_button.config(text="📑")  # скрыт
         else:
             self.left_toc = TOCList(self.left_frame, None)
-            self.left_toc.pack(side=tk.LEFT, fill=tk.Y, before=self.left_line_numbers)
+            self.left_toc_scroll = tk.Scrollbar(
+                self.left_frame, orient=tk.VERTICAL, command=self.left_toc.yview
+            )
+            self.left_toc.configure(yscrollcommand=self.left_toc_scroll.set)
+            self.left_toc_scroll.pack(
+                side=tk.LEFT, fill=tk.Y, before=self.left_line_numbers
+            )
+            self.left_toc.pack(side=tk.LEFT, fill=tk.Y, before=self.left_toc_scroll)
             self.left_toc.text_widget = self.left_text
-            self.root.after_idle(self.left_toc.update_toc)
+
+            self.left_toc.update_toc()
             self.toggle_left_toc_button.config(text="👈")  # показан
 
     def apply_format(self, style):

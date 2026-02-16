@@ -132,6 +132,19 @@ class BnfEditor:
         cancel_button = ttk.Button(buttons_frame, text="Отмена", command=dialog.destroy)
         cancel_button.pack(side=tk.LEFT, padx=5)
 
+        dialog.bind(
+            "<Control-s>",
+            lambda event: self.save_metadata(
+                dialog,
+                metadata_path,
+                title_var,
+                author_var,
+                lang_var,
+                tags_var,
+                desc_text,
+            ),
+        )
+
     def save_metadata(
         self,
         dialog,

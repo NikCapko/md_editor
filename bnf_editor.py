@@ -26,9 +26,7 @@ class BnfEditor:
 
         # Путь к файлу метаданных
         base_dir = os.path.dirname(self.orig_path)
-        base_name = os.path.splitext(
-            os.path.splitext(os.path.basename(self.orig_path))[0]
-        )[0]
+        base_name = os.path.basename(self.orig_path).replace(".md", "")
         metadata_path = os.path.join(base_dir, f"{base_name}.bnf")
 
         description_text = ""

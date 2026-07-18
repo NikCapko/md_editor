@@ -10,7 +10,7 @@ class TOCList(tk.Listbox):
         super().__init__(parent, *args, **kwargs)
         self.text_widget = text_widget
 
-        self.configure(width=40, activestyle="none", exportselection=False)
+        self.configure(width=25, activestyle="none", exportselection=False)
         self.bind("<ButtonRelease-1>", self.on_select)
         self.bind("<<ListboxSelect>>", self.on_select)
 
@@ -102,3 +102,25 @@ class TOCList(tk.Listbox):
             self.text_widget.mark_set("insert", f"{text_line_number}.0")
             self.text_widget.see(f"{text_line_number}.0")
             self.text_widget.focus_set()
+
+    def update_selection_by_text_line(self, line_num):
+        selected_index = None
+        indexes = sorted(self.headers_data.keys())
+        for index in indexes:
+            if line_num < self.headers_data[index][0] and index >= 1:
+                if index == 1:
+                    if line_num >= self.headers_data[0][0]:
+                        selected_index = index - 1
+                    else:
+                        selected_index = None
+                else:
+                    selected_index = index - 1
+                break
+            elif index == len(indexes) - 1 and line_num >= self.headers_data[index][0]:
+                selected_index = index
+                break
+        if selected_index is None:
+            self.selection_clear(0, tk.END)
+        else:
+            self.selection_clear(0, tk.END)
+            self.selection_set(selected_index)

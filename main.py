@@ -298,12 +298,21 @@ class SideBySideEditor:
 
         self.left_text.configure(yscrollcommand=self.on_text_scroll_left)
 
+        self.left_text.bind("<<Modified>>", self.on_left_text_modified)
+        self.left_text.edit_modified(False)
+
         root.bind("<Control-f>", self.on_ctrl_f)
         root.bind("<Control-r>", self.on_ctrl_r)
+
+        self.left_text.bind("<<Paste>>", lambda e: self.update_left_text_async())
+        self.left_text.bind("<<Cut>>", lambda e: self.update_left_text_async())
 
         if len(sys.argv) > 1:
             file_path = sys.argv[1]
             self.load_md_file(file_path)
+
+    def update_left_text_async(self):
+        self.left_text.after(300, self.update_left_text)
 
     def update_left_text(self):
         self.left_text.schedule_highlight_markdown()
@@ -549,6 +558,11 @@ class SideBySideEditor:
             1,
             lambda: self._highlight_line_with_sync(self.left_text),
         )
+        # обновляем выделение текущего заголовка
+        index = self.left_text.index("insert")
+        line_num = index.split(".")[0]
+
+        self.left_toc.update_selection_by_text_line(int(line_num))
 
     def _highlight_line_with_sync(self, src_text):
         self._highlight_line(src_text)

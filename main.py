@@ -421,8 +421,10 @@ class SideBySideEditor:
             filename, _ = os.path.splitext(os.path.basename(self.orig_path))
             base_name = filename.strip()
             self.file_title.config(text=f"{base_name}")
+            self.root.title(base_name)
         else:
             self.file_title.config(text="Файл не загружен")
+            self.root.title("MD Editor")
 
     def save_text_to_file(self, text_widget, path):
         content = text_widget.get("1.0", "end-1c")

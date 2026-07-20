@@ -127,6 +127,9 @@ class SearchDialog:
 
         text_content = widget.get("1.0", tk.END)
 
+        widget.tag_remove("search_highlight_all", "1.0", tk.END)
+        widget.tag_remove("search_highlight", "1.0", tk.END)
+
         if use_regex:
             try:
                 flags = 0 if match_case else re.IGNORECASE

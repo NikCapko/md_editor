@@ -45,17 +45,17 @@ class ReplaceDialog:
         replace_entry.grid(row=1, column=1, padx=5, pady=5)
 
         regex_var = tk.BooleanVar()
-        tk.Checkbutton(replace_win, text="RegEx", variable=regex_var).grid(
+        tk.Checkbutton(replace_win, text="Регулярное выражение", variable=regex_var).grid(
             row=2, column=0, padx=5
         )
 
         case_sensitive_var = tk.BooleanVar()
         tk.Checkbutton(
-            replace_win, text="Case sensitive", variable=case_sensitive_var
+            replace_win, text="С учетом регистра", variable=case_sensitive_var
         ).grid(row=2, column=1, padx=5)
 
         select_all_var = tk.BooleanVar()
-        tk.Checkbutton(replace_win, text="Select All", variable=select_all_var).grid(
+        tk.Checkbutton(replace_win, text="Выделить все", variable=select_all_var).grid(
             row=2, column=2, padx=5
         )
 
@@ -158,10 +158,10 @@ class ReplaceDialog:
             self.goto_prev_match()
 
         # --- Кнопки ---
-        tk.Button(replace_win, text="Replace", command=replace_current).grid(
+        tk.Button(replace_win, text="Заменить", command=replace_current).grid(
             row=3, column=0
         )
-        tk.Button(replace_win, text="Replace All", command=replace_all).grid(
+        tk.Button(replace_win, text="Заменить все", command=replace_all).grid(
             row=3, column=1
         )
         tk.Button(replace_win, text="🔎", command=start_search).grid(row=3, column=2)

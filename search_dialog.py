@@ -38,18 +38,18 @@ class SearchDialog:
         search_entry.pack(side=tk.LEFT, padx=5, pady=5)
 
         regex_var = tk.BooleanVar()
-        regex_check = tk.Checkbutton(search_win, text="RegEx", variable=regex_var)
+        regex_check = tk.Checkbutton(search_win, text="Регулярное выражение", variable=regex_var)
         regex_check.pack(side=tk.LEFT, padx=5, pady=5)
 
         select_all_var = tk.BooleanVar()
         select_all_check = tk.Checkbutton(
-            search_win, text="Select All", variable=select_all_var
+            search_win, text="Выделить все", variable=select_all_var
         )
         select_all_check.pack(side=tk.LEFT, padx=5, pady=5)
 
         match_case_var = tk.BooleanVar()
         match_case_check = tk.Checkbutton(
-            search_win, text="Match Case", variable=match_case_var
+            search_win, text="С учетом регистра", variable=match_case_var
         )
         match_case_check.pack(side=tk.LEFT, padx=5, pady=5)
 

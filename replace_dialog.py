@@ -18,23 +18,30 @@ class ReplaceDialog:
         replace_win.resizable(False, False)
         replace_win.attributes("-topmost", True)
 
-        options = [
+        search_options = [
+            r"[а-я] — [а-я]",
             r".+\n.+",
             r"\n\n\n",
             r"(?<!\n\n)\n\*{3,}\n(?!\n\n)",
         ]
 
+        replace_options = [
+            r"\1-\2",
+        ]
+
         # --- Найти ---
         tk.Label(replace_win, text="Найти:").grid(row=0, column=0, padx=5, pady=5)
         search_entry = ttk.Combobox(
-            replace_win, values=options, width=30, state="normal"
+            replace_win, values=search_options, width=30, state="normal"
         )
         search_entry.grid(row=0, column=1, padx=5, pady=5)
         search_entry.focus_set()
 
         # --- Заменить ---
         tk.Label(replace_win, text="Заменить:").grid(row=1, column=0, padx=5, pady=5)
-        replace_entry = ttk.Combobox(replace_win, width=30, state="normal")
+        replace_entry = ttk.Combobox(
+            replace_win, values=replace_options, width=30, state="normal"
+        )
         replace_entry.grid(row=1, column=1, padx=5, pady=5)
 
         regex_var = tk.BooleanVar()
@@ -90,11 +97,7 @@ class ReplaceDialog:
                     flags = 0 if case_sensitive_var.get() else re.IGNORECASE
                     # re.sub with count=1 expands \1, \2, \n, \g<name> etc. correctly
                     expanded = re.sub(
-                        search_entry.get(),
-                        replace_text,
-                        matched,
-                        count=1,
-                        flags=flags
+                        search_entry.get(), replace_text, matched, count=1, flags=flags
                     )
                 except re.error as e:
                     DialogManager.show_dialog("Ошибка RegEx", str(e))
@@ -109,7 +112,6 @@ class ReplaceDialog:
             # After a successful replacement we must rebuild the match list
             # (positions have shifted)
             start_search()
-
 
         def replace_all():
             term = search_entry.get()

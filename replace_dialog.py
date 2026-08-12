@@ -19,7 +19,8 @@ class ReplaceDialog:
         replace_win.attributes("-topmost", True)
 
         search_options = [
-            r"[а-я] — [а-я]",
+            r"([а-я]) — ([а-я])",
+            r"(?<!\s)—",
             r".+\n.+",
             r"\n\n\n",
             r"(?<!\n\n)\n\*{3,}\n(?!\n\n)",
@@ -27,6 +28,7 @@ class ReplaceDialog:
 
         replace_options = [
             r"\1-\2",
+            r"\n\n —"
         ]
 
         # --- Найти ---

@@ -151,6 +151,15 @@ class SideBySideEditor:
         self.italic_button.pack(side=tk.LEFT, padx=2)
         ToolTip(self.italic_button, "italic format")
 
+        self.bold_italic_button = tk.Button(
+            self.format_frame,
+            text="***B***",
+            command=lambda: self.apply_format("bold_italic"),
+            font=("Arial", 8, "bold italic"),
+        )
+        self.bold_italic_button.pack(side=tk.LEFT, padx=2)
+        ToolTip(self.bold_italic_button, "bold italic format")
+
         self.h1_button = tk.Button(
             self.format_frame,
             text="H1",

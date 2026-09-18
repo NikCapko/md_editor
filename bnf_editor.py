@@ -17,7 +17,7 @@ class BnfEditor:
 
         dialog = tk.Toplevel()
         dialog.title("Метаданные книги")
-        dialog.geometry("820x520")
+        dialog.geometry("820x550")
         dialog.resizable(False, False)
 
         main_frame = ttk.Frame(dialog, padding="10")
@@ -116,7 +116,7 @@ class BnfEditor:
         # Text-виджет позволяет чипсам переноситься на новую строку
         tags_display = tk.Text(
             chips_wrapper,
-            height=8,  # примерно 8 строк чипсов
+            height=11,  # примерно 11 строк чипсов
             wrap="word",
             relief="flat",
             borderwidth=0,

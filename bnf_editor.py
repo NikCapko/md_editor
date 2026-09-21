@@ -17,7 +17,7 @@ class BnfEditor:
 
         dialog = tk.Toplevel()
         dialog.title("Метаданные книги")
-        dialog.geometry("820x550")
+        dialog.geometry("820x600")
         dialog.resizable(False, False)
 
         main_frame = ttk.Frame(dialog, padding="10")
@@ -28,6 +28,7 @@ class BnfEditor:
         author_var = tk.StringVar()
         lang_var = tk.StringVar(value="en-ru")
         tag_entry_var = tk.StringVar()
+        favorite_var = tk.BooleanVar()
 
         all_tags = sorted(self.tag_history[:])
         current_tags = []
@@ -48,6 +49,7 @@ class BnfEditor:
                     title_var.set(data.get("title", ""))
                     author_var.set(data.get("author", ""))
                     lang_var.set(data.get("lang", "en-ru"))
+                    favorite_var.set(data.get("favorite", False))
                     current_tags = [
                         t.strip().lower() for t in data.get("tags", []) if t.strip()
                     ]
@@ -95,6 +97,17 @@ class BnfEditor:
             state="readonly",
             width=50,
         ).grid(row=row, column=1, sticky="ew", padx=5, pady=5)
+        row += 1
+
+        ttk.Label(main_frame, text="Избранное:", font=("Arial", 10, "bold")).grid(
+            row=row, column=0, sticky="w", pady=5
+        )
+        ttk.Checkbutton(
+            main_frame,
+            variable=favorite_var,
+            onvalue=True,
+            offvalue=False,
+        ).grid(row=row, column=1, sticky="ew", padx=5, pady=(8, 4))
         row += 1
 
         # ===== Теги =====
@@ -255,6 +268,7 @@ class BnfEditor:
                 title_var,
                 author_var,
                 lang_var,
+                favorite_var,
                 current_tags,
                 all_tags,
                 desc_text,
@@ -298,6 +312,7 @@ class BnfEditor:
         title_var,
         author_var,
         lang_var,
+        favorite_var,
         current_tags,
         all_tags,
         desc_text,
@@ -306,6 +321,7 @@ class BnfEditor:
             "title": title_var.get(),
             "author": author_var.get(),
             "lang": lang_var.get(),
+            "favorite": favorite_var.get(),
             "tags": current_tags,
             "description": desc_text.get("1.0", "end-1c"),
         }

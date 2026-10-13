@@ -27,6 +27,7 @@ class SearchDialog:
             r"[а-я]\n",
             r"[а-я]\n\n [А-Я]",
             r"(?<!\n\n)\n\*{3,}\n(?!\n\n)",
+            r"[а-я]\n|\n [а-я]",
         ]
 
         tk.Label(search_win, text="Найти:").pack(side=tk.LEFT, padx=5, pady=5)

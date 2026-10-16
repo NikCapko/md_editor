@@ -127,13 +127,14 @@ class BnfEditor:
         # Text-виджет позволяет чипсам переноситься на новую строку
         tags_display = tk.Text(
             chips_wrapper,
-            height=14,  # примерно 14 строк чипсов
+            height=16,  # примерно 16 строк чипсов
             wrap="word",
             relief="flat",
             borderwidth=0,
             highlightthickness=0,
-            padx=0,
+            padx=5,
             pady=2,
+            spacing2=2,
             cursor="arrow",
             state="normal",
         )
@@ -173,7 +174,7 @@ class BnfEditor:
                     text=tag,
                     bg=bg,
                     fg=fg,
-                    padx=9,
+                    padx=5,
                     pady=3,
                     font=("Arial", 9),
                     cursor="hand2",

@@ -26,7 +26,7 @@ class BnfEditor:
         # Переменные
         title_var = tk.StringVar()
         author_var = tk.StringVar()
-        lang_var = tk.StringVar(value="en-ru")
+        lang_var = tk.StringVar(value="ru")
         tag_entry_var = tk.StringVar()
         favorite_var = tk.BooleanVar()
 
@@ -91,7 +91,7 @@ class BnfEditor:
         ttk.Combobox(
             main_frame,
             textvariable=lang_var,
-            values=("en-ru",),
+            values=("en", "ru"),
             state="readonly",
             width=50,
         ).grid(row=row, column=1, sticky="ew", padx=5, pady=5)
@@ -280,8 +280,6 @@ class BnfEditor:
         cancel_button.pack(side=tk.LEFT, padx=5)
 
         dialog.bind("<Control-s>", lambda e: do_save())
-
-        tag_entry.focus_set()
 
     def _load_tag_history(self):
         if not os.path.exists(self.history_path):
